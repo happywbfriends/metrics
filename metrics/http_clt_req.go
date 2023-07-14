@@ -10,27 +10,31 @@ const (
 	metricsSubsystemHttpClt = "http_clt"
 )
 
-type IHttpClientMetrics interface {
+type IHttpClientRequestMetrics interface {
 	IncDone(statusCode int)
 	IncError(e error)
-	Measure(duration time.Duration)
+	RequestDuration(duration time.Duration)
 }
 
 type NoHttpClientMetrics struct{}
 
-func (m *NoHttpClientMetrics) IncDone(int)           {}
-func (m *NoHttpClientMetrics) IncError(error)        {}
-func (m *NoHttpClientMetrics) Measure(time.Duration) {}
+func (m *NoHttpClientMetrics) IncDone(int)                   {}
+func (m *NoHttpClientMetrics) IncError(error)                {}
+func (m *NoHttpClientMetrics) RequestDuration(time.Duration) {}
 
-func NewHttpClientMetrics(clientName, methodName string, requestTimeMsBuckets []float64) IHttpClientMetrics {
+func NewHttpClientRequestMetrics(clientName, methodName string) IHttpClientRequestMetrics {
+	return NewHttpClientRequestMetricsWithBuckets(clientName, methodName, DefaultDurationMsBuckets)
+}
+
+func NewHttpClientRequestMetricsWithBuckets(clientName, methodName string, requestTimeMsBuckets []float64) IHttpClientRequestMetrics {
 	labels := map[string]string{
 		metricsLabelClient: clientName,
 		metricsLabelMethod: methodName,
 	}
 
 	m := &httpClientMetrics{
-		nbDone:        newCounterVec(metricsNamespace, metricsSubsystemHttpClt, "nb_success", labels, []string{metricsLabelStatusCode}),
-		nbError:       newCounter(metricsNamespace, metricsSubsystemHttpClt, "nb_error", labels),
+		nbDone:        newCounterVec(metricsNamespace, metricsSubsystemHttpClt, "nb_req_done", labels, []string{metricsLabelStatusCode}),
+		nbError:       newCounter(metricsNamespace, metricsSubsystemHttpClt, "nb_req_error", labels),
 		requestTimeMs: newHistogram(metricsNamespace, metricsSubsystemHttpClt, "req_duration_ms", labels, requestTimeMsBuckets),
 	}
 
@@ -58,6 +62,6 @@ func (m *httpClientMetrics) IncError(error) {
 	m.nbError.Inc()
 }
 
-func (m *httpClientMetrics) Measure(t time.Duration) {
+func (m *httpClientMetrics) RequestDuration(t time.Duration) {
 	m.requestTimeMs.Observe(float64(t.Milliseconds()))
 }

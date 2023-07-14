@@ -18,7 +18,7 @@ func (m *NoHttpServerMetrics) DecNbConnections() {}
 
 func NewHttpServerMetrics() IHttpServerMetrics {
 	m := &httpServerMetrics{
-		nbConnections: newGauge(metricsNamespace, metricsSubsystemHttpServer, "nb_current_conns", nil),
+		nbConnections: newGauge(metricsNamespace, metricsSubsystemHttpServer, "current_conns", nil),
 	}
 	return m
 }
