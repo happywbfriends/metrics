@@ -21,18 +21,24 @@ func (m *NoHttpServerMetrics) IncNotFound(string)                 {}
 func (m *NoHttpServerMetrics) IncMethodNotAllowed(string, string) {}
 
 func NewHttpServerMetrics() IHttpServerMetrics {
-	m := &httpServerMetrics{
-		nbConnections:      newGauge(metricsNamespace, metricsSubsystemHttpServer, "current_conns", nil),
-		nbNotFound:         newGauge(metricsNamespace, metricsSubsystemHttpServer, "nb_req_not_found", nil),
-		nbMethodNotAllowed: newGauge(metricsNamespace, metricsSubsystemHttpServer, "nb_req_not_allowed", nil),
+	labels := map[string]string{
+		metricsLabelMethod: "",
 	}
+
+	m := &httpServerMetrics{
+		nbConnections: newGauge(metricsNamespace, metricsSubsystemHttpServer, "current_conns", nil),
+		nbRequests:    newCounterVec(metricsNamespace, metricsSubsystemHttpServer, "nb_req", labels, []string{metricsLabelStatusCode}),
+	}
+	m.nbRequests404 = m.nbRequests.WithLabelValues("404")
+	m.nbRequests405 = m.nbRequests.WithLabelValues("405")
 	return m
 }
 
 type httpServerMetrics struct {
-	nbConnections      prometheus.Gauge
-	nbNotFound         prometheus.Counter
-	nbMethodNotAllowed prometheus.Counter
+	nbConnections prometheus.Gauge
+	nbRequests    *prometheus.CounterVec
+	nbRequests404 prometheus.Counter
+	nbRequests405 prometheus.Counter
 }
 
 func (m *httpServerMetrics) IncNbConnections() {
@@ -43,8 +49,8 @@ func (m *httpServerMetrics) DecNbConnections() {
 }
 
 func (m *httpServerMetrics) IncNotFound(string) {
-	m.nbNotFound.Inc()
+	m.nbRequests404.Inc()
 }
 func (m *httpServerMetrics) IncMethodNotAllowed(_, _ string) {
-	m.nbMethodNotAllowed.Inc()
+	m.nbRequests405.Inc()
 }
