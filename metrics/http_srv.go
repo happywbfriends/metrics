@@ -15,8 +15,10 @@ type IHttpServerMetrics interface {
 
 type NoHttpServerMetrics struct{}
 
-func (m *NoHttpServerMetrics) IncNbConnections() {}
-func (m *NoHttpServerMetrics) DecNbConnections() {}
+func (m *NoHttpServerMetrics) IncNbConnections()                  {}
+func (m *NoHttpServerMetrics) DecNbConnections()                  {}
+func (m *NoHttpServerMetrics) IncNotFound(string)                 {}
+func (m *NoHttpServerMetrics) IncMethodNotAllowed(string, string) {}
 
 func NewHttpServerMetrics() IHttpServerMetrics {
 	m := &httpServerMetrics{
