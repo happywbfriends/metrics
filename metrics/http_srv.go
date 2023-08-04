@@ -1,6 +1,9 @@
 package metrics
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"github.com/prometheus/client_golang/prometheus"
+	"strconv"
+)
 
 const (
 	metricsSubsystemHttpServer = "http_srv"
@@ -9,16 +12,16 @@ const (
 type IHttpServerMetrics interface {
 	IncNbConnections()
 	DecNbConnections()
-	IncNotFound(path string)
-	IncMethodNotAllowed(method, path string)
+	IncNotFound(path string, supplierOldId int)
+	IncMethodNotAllowed(method, path string, supplierOldId int)
 }
 
 type NoHttpServerMetrics struct{}
 
-func (m *NoHttpServerMetrics) IncNbConnections()                  {}
-func (m *NoHttpServerMetrics) DecNbConnections()                  {}
-func (m *NoHttpServerMetrics) IncNotFound(string)                 {}
-func (m *NoHttpServerMetrics) IncMethodNotAllowed(string, string) {}
+func (m *NoHttpServerMetrics) IncNbConnections()                       {}
+func (m *NoHttpServerMetrics) DecNbConnections()                       {}
+func (m *NoHttpServerMetrics) IncNotFound(string, int)                 {}
+func (m *NoHttpServerMetrics) IncMethodNotAllowed(string, string, int) {}
 
 func NewHttpServerMetrics() IHttpServerMetrics {
 	labels := map[string]string{
@@ -27,30 +30,28 @@ func NewHttpServerMetrics() IHttpServerMetrics {
 
 	m := &httpServerMetrics{
 		nbConnections: newGauge(metricsNamespace, metricsSubsystemHttpServer, "current_conns", nil),
-		nbRequests:    newCounterVec(metricsNamespace, metricsSubsystemHttpServer, "nb_req", labels, []string{metricsLabelStatusCode}),
+		nbRequests:    newCounterVec(metricsNamespace, metricsSubsystemHttpServer, "nb_req", labels, []string{metricsLabelStatusCode, metricsLabelSupplierOldId}),
 	}
-	m.nbRequests404 = m.nbRequests.WithLabelValues("404")
-	m.nbRequests405 = m.nbRequests.WithLabelValues("405")
 	return m
 }
 
 type httpServerMetrics struct {
 	nbConnections prometheus.Gauge
 	nbRequests    *prometheus.CounterVec
-	nbRequests404 prometheus.Counter
-	nbRequests405 prometheus.Counter
 }
 
 func (m *httpServerMetrics) IncNbConnections() {
 	m.nbConnections.Inc()
 }
+
 func (m *httpServerMetrics) DecNbConnections() {
 	m.nbConnections.Dec()
 }
 
-func (m *httpServerMetrics) IncNotFound(string) {
-	m.nbRequests404.Inc()
+func (m *httpServerMetrics) IncNotFound(_ string, supplierOldId int) {
+	m.nbRequests.WithLabelValues("404", strconv.Itoa(supplierOldId)).Inc()
 }
-func (m *httpServerMetrics) IncMethodNotAllowed(_, _ string) {
-	m.nbRequests405.Inc()
+
+func (m *httpServerMetrics) IncMethodNotAllowed(_, _ string, supplierOldId int) {
+	m.nbRequests.WithLabelValues("405", strconv.Itoa(supplierOldId)).Inc()
 }
