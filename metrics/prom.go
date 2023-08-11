@@ -88,3 +88,20 @@ func newHistogram(ns, subsystem, name string, labelsOpt map[string]string, bucke
 	prometheus.MustRegister(m)
 	return m
 }
+
+func newHistogramVec(ns, subsystem, name string, labelsOpt map[string]string, buckets []float64, variableLabels []string) *prometheus.HistogramVec {
+	if len(labelsOpt) == 0 {
+		labelsOpt = nil
+	}
+
+	m := prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace:   ns,
+			Subsystem:   subsystem,
+			Name:        name,
+			ConstLabels: labelsOpt,
+			Buckets:     buckets,
+		}, variableLabels)
+	prometheus.MustRegister(m)
+	return m
+}
