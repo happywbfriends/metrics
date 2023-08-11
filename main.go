@@ -16,12 +16,14 @@ func httpServerExample() {
 	// Метрики конкретного запроса
 	httpServerRequestMetricsBar := metrics.NewHttpServerRequestMetrics("/bar")
 
+	supplierOldId := 999
+
 	// Обработчик для 404
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		httpServerMetrics.IncNbConnections()
 		defer httpServerMetrics.DecNbConnections()
 
-		httpServerMetrics.IncNotFound(r.URL.Path)
+		httpServerMetrics.IncNotFound(r.URL.Path, supplierOldId)
 	})
 
 	// Обработчик /bar
@@ -32,8 +34,8 @@ func httpServerExample() {
 		since := time.Now()
 		status := http.StatusOK
 		defer func() {
-			httpServerRequestMetricsBar.RequestDuration(time.Since(since))
-			httpServerRequestMetricsBar.IncNbRequest(status)
+			httpServerRequestMetricsBar.RequestDuration(time.Since(since), supplierOldId)
+			httpServerRequestMetricsBar.IncNbRequest(status, supplierOldId)
 		}()
 
 		w.WriteHeader(status)
