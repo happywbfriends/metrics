@@ -8,52 +8,40 @@ import (
 	"github.com/happywbfriends/metrics/metrics"
 )
 
-func NewHttpClientMetrics(clientName, methodName string) HttpClientMetrics {
-	return NewHttpClientRequestMetricsWithBuckets(clientName, methodName, metrics.DefaultDurationMsBuckets)
+func NewHttpClientMetrics() HttpClientMetrics {
+	return NewHttpClientRequestMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
 }
 
-func NewHttpClientRequestMetricsWithBuckets(clientName, methodName string, requestTimeMsBuckets []float64) HttpClientMetrics {
-	labels := map[string]string{
-		metrics.MetricsLabelClient: clientName,
-		metrics.MetricsLabelMethod: methodName,
-	}
-
+func NewHttpClientRequestMetricsWithBuckets(requestTimeMsBuckets []float64) HttpClientMetrics {
 	m := &httpClientMetrics{
-		nbDone:        metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_done", labels, []string{metrics.MetricsLabelStatusCode}),
-		nbError:       metrics.NewCounter(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_error", labels),
-		requestTimeMs: metrics.NewHistogram(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "req_duration_ms", labels, requestTimeMsBuckets),
+		nbDone:        metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_done", nil, []string{metrics.MetricsLabelClient, metrics.MetricsLabelMethod, metrics.MetricsLabelStatusCode}),
+		nbError:       metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_error", nil, []string{metrics.MetricsLabelClient, metrics.MetricsLabelMethod}),
+		requestTimeMs: metrics.NewHistogramVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "req_duration_ms", nil, requestTimeMsBuckets, []string{metrics.MetricsLabelClient, metrics.MetricsLabelMethod}),
 	}
-
-	m.nbDone200 = m.nbDone.WithLabelValues("200") // recommended optimization
 
 	return m
 }
 
 type HttpClientMetrics interface {
-	IncDone(statusCode int)
-	IncError(e error)
-	RequestDuration(duration time.Duration)
+	IncNbDone(client string, method string, statusCode int)
+	IncNbError(client string, method string)
+	RequestDuration(client string, method string, t time.Duration)
 }
 
 type httpClientMetrics struct {
 	nbDone        *prometheus.CounterVec
-	nbDone200     prometheus.Counter // cached for optimization
-	nbError       prometheus.Counter
-	requestTimeMs prometheus.Histogram
+	nbError       *prometheus.CounterVec
+	requestTimeMs *prometheus.HistogramVec
 }
 
-func (m *httpClientMetrics) IncDone(statusCode int) {
-	if statusCode == 200 {
-		m.nbDone200.Inc()
-	} else {
-		m.nbDone.WithLabelValues(strconv.Itoa(statusCode)).Inc()
-	}
+func (m *httpClientMetrics) IncNbDone(client string, method string, statusCode int) {
+	m.nbDone.WithLabelValues(client, method, strconv.Itoa(statusCode)).Inc()
 }
 
-func (m *httpClientMetrics) IncError(error) {
-	m.nbError.Inc()
+func (m *httpClientMetrics) IncNbError(client string, method string) {
+	m.nbError.WithLabelValues(client, method).Inc()
 }
 
-func (m *httpClientMetrics) RequestDuration(t time.Duration) {
-	m.requestTimeMs.Observe(float64(t.Milliseconds()))
+func (m *httpClientMetrics) RequestDuration(client string, method string, t time.Duration) {
+	m.requestTimeMs.WithLabelValues(client, method).Observe(float64(t.Milliseconds()))
 }
