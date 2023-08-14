@@ -28,14 +28,14 @@ func NewHttpClientRequestMetrics(clientName, methodName string) IHttpClientReque
 
 func NewHttpClientRequestMetricsWithBuckets(clientName, methodName string, requestTimeMsBuckets []float64) IHttpClientRequestMetrics {
 	labels := map[string]string{
-		metricsLabelClient: clientName,
-		metricsLabelMethod: methodName,
+		MetricsLabelClient: clientName,
+		MetricsLabelMethod: methodName,
 	}
 
 	m := &httpClientMetrics{
-		nbDone:        newCounterVec(metricsNamespace, metricsSubsystemHttpClt, "nb_req_done", labels, []string{metricsLabelStatusCode}),
-		nbError:       newCounter(metricsNamespace, metricsSubsystemHttpClt, "nb_req_error", labels),
-		requestTimeMs: newHistogram(metricsNamespace, metricsSubsystemHttpClt, "req_duration_ms", labels, requestTimeMsBuckets),
+		nbDone:        NewCounterVec(MetricsNamespace, metricsSubsystemHttpClt, "nb_req_done", labels, []string{MetricsLabelStatusCode}),
+		nbError:       NewCounter(MetricsNamespace, metricsSubsystemHttpClt, "nb_req_error", labels),
+		requestTimeMs: NewHistogram(MetricsNamespace, metricsSubsystemHttpClt, "req_duration_ms", labels, requestTimeMsBuckets),
 	}
 
 	m.nbDone200 = m.nbDone.WithLabelValues("200") // recommended optimization

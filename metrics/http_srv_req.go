@@ -24,11 +24,11 @@ func NewHttpServerRequestMetrics(methodName string) IHttpServerRequestMetrics {
 
 func NewHttpServerRequestMetricsWithBuckets(methodName string, requestTimeMsBuckets []float64) IHttpServerRequestMetrics {
 	labels := map[string]string{
-		metricsLabelMethod: methodName,
+		MetricsLabelMethod: methodName,
 	}
 	m := &httpServerRequestMetrics{
-		nbRequests:    newCounterVec(metricsNamespace, metricsSubsystemHttpServer, "nb_req", labels, []string{metricsLabelStatusCode, metricsLabelSupplierOldId}),
-		requestTimeMs: newHistogram(metricsNamespace, metricsSubsystemHttpServer, "req_duration_ms", labels, requestTimeMsBuckets),
+		nbRequests:    NewCounterVec(MetricsNamespace, MetricsSubsystemHttpServer, "nb_req", labels, []string{MetricsLabelStatusCode, MetricsLabelSupplierOldId}),
+		requestTimeMs: NewHistogram(MetricsNamespace, MetricsSubsystemHttpServer, "req_duration_ms", labels, requestTimeMsBuckets),
 	}
 	return m
 }
