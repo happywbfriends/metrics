@@ -2,7 +2,7 @@ package metrics
 
 import "github.com/prometheus/client_golang/prometheus"
 
-func newCounter(ns, subsystem, name string, labelsOpt map[string]string) prometheus.Counter {
+func NewCounter(ns, subsystem, name string, labelsOpt map[string]string) prometheus.Counter {
 
 	if len(labelsOpt) == 0 { // no empty maps
 		labelsOpt = nil
@@ -19,7 +19,7 @@ func newCounter(ns, subsystem, name string, labelsOpt map[string]string) prometh
 	return m
 }
 
-func newCounterVec(ns, subsystem, name string, labelsOpt map[string]string, variableLabels []string) *prometheus.CounterVec {
+func NewCounterVec(ns, subsystem, name string, labelsOpt map[string]string, variableLabels []string) *prometheus.CounterVec {
 
 	if len(labelsOpt) == 0 { // no empty maps
 		labelsOpt = nil
@@ -37,7 +37,7 @@ func newCounterVec(ns, subsystem, name string, labelsOpt map[string]string, vari
 	return m
 }
 
-func newGauge(ns, subsystem, name string, labelsOpt map[string]string) prometheus.Gauge {
+func NewGauge(ns, subsystem, name string, labelsOpt map[string]string) prometheus.Gauge {
 
 	if len(labelsOpt) == 0 { // no empty maps
 		labelsOpt = nil
@@ -54,7 +54,7 @@ func newGauge(ns, subsystem, name string, labelsOpt map[string]string) prometheu
 	return m
 }
 
-func newSummary(ns, subsystem, name string, labelsOpt map[string]string) prometheus.Summary {
+func NewSummary(ns, subsystem, name string, labelsOpt map[string]string) prometheus.Summary {
 
 	if len(labelsOpt) == 0 { // no empty maps
 		labelsOpt = nil
@@ -71,7 +71,7 @@ func newSummary(ns, subsystem, name string, labelsOpt map[string]string) prometh
 	return m
 }
 
-func newHistogram(ns, subsystem, name string, labelsOpt map[string]string, buckets []float64) prometheus.Histogram {
+func NewHistogram(ns, subsystem, name string, labelsOpt map[string]string, buckets []float64) prometheus.Histogram {
 
 	if len(labelsOpt) == 0 { // no empty maps
 		labelsOpt = nil
@@ -89,7 +89,7 @@ func newHistogram(ns, subsystem, name string, labelsOpt map[string]string, bucke
 	return m
 }
 
-func newHistogramVec(ns, subsystem, name string, labelsOpt map[string]string, buckets []float64, variableLabels []string) *prometheus.HistogramVec {
+func NewHistogramVec(ns, subsystem, name string, labelsOpt map[string]string, buckets []float64, variableLabels []string) *prometheus.HistogramVec {
 	if len(labelsOpt) == 0 {
 		labelsOpt = nil
 	}

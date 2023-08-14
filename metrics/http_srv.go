@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	metricsSubsystemHttpServer = "http_srv"
+	MetricsSubsystemHttpServer = "http_srv"
 )
 
 type IHttpServerMetrics interface {
@@ -25,12 +25,12 @@ func (m *NoHttpServerMetrics) IncMethodNotAllowed(string, string, int) {}
 
 func NewHttpServerMetrics() IHttpServerMetrics {
 	labels := map[string]string{
-		metricsLabelMethod: "",
+		MetricsLabelMethod: "",
 	}
 
 	m := &httpServerMetrics{
-		nbConnections: newGauge(metricsNamespace, metricsSubsystemHttpServer, "current_conns", nil),
-		nbRequests:    newCounterVec(metricsNamespace, metricsSubsystemHttpServer, "nb_req", labels, []string{metricsLabelStatusCode, metricsLabelSupplierOldId}),
+		nbConnections: NewGauge(MetricsNamespace, MetricsSubsystemHttpServer, "current_conns", nil),
+		nbRequests:    NewCounterVec(MetricsNamespace, MetricsSubsystemHttpServer, "nb_req", labels, []string{MetricsLabelStatusCode, MetricsLabelSupplierOldId}),
 	}
 	return m
 }

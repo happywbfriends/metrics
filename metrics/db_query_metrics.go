@@ -15,14 +15,14 @@ type IDbQueryMetrics interface {
 
 func NewDbQueryMetrics(dbName, queryName string) IDbQueryMetrics {
 	labels := map[string]string{
-		metricsLabelDatabase:      dbName,
-		metricsLabelDatabaseQuery: queryName,
+		MetricsLabelDatabase:      dbName,
+		MetricsLabelDatabaseQuery: queryName,
 	}
 
 	return &dbRequestMetrics{
-		durationMs: newHistogram(metricsNamespace, metricsSubsystemDbQuery, "duration_ms", labels, DefaultDurationMsBuckets),
-		nbDone:     newCounter(metricsNamespace, metricsSubsystemDbQuery, "nb_done", labels),
-		nbError:    newCounter(metricsNamespace, metricsSubsystemDbQuery, "nb_error", labels),
+		durationMs: newHistogram(MetricsNamespace, metricsSubsystemDbQuery, "duration_ms", labels, DefaultDurationMsBuckets),
+		nbDone:     NewCounter(MetricsNamespace, metricsSubsystemDbQuery, "nb_done", labels),
+		nbError:    NewCounter(MetricsNamespace, metricsSubsystemDbQuery, "nb_error", labels),
 	}
 }
 
@@ -43,12 +43,13 @@ func (m *dbRequestMetrics) IncError(error) {
 }
 
 /*
-	Helper для быстрого расчета метрик запроса. Плюсом идет то, что метод сам анализирует ошибку и может инкрементить
-	нужные вспомогательные метрики.
+Helper для быстрого расчета метрик запроса. Плюсом идет то, что метод сам анализирует ошибку и может инкрементить
+нужные вспомогательные метрики.
 
-	Пример:
+Пример:
 
-	```
+```
+
 	func SomeDatabaseMethod() (e error){
 		defer func(from time.Time) {
 			metrics.DbQueryMetricsHelper(metrics, from, e)
@@ -56,7 +57,8 @@ func (m *dbRequestMetrics) IncError(error) {
 
 		// Your code goes here
 	}
-	```
+
+```
 */
 func DbQueryMetricsHelper(m IDbQueryMetrics, startTm time.Time, err error) {
 	m.QueryDuration(time.Since(startTm))

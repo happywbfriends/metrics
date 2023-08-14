@@ -1,9 +1,11 @@
-package metrics
+package v1
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
 	"strconv"
 	"time"
+
+	"github.com/happywbfriends/metrics/metrics"
 )
 
 type HTTPServerRequestMetricsV1 interface {
@@ -25,13 +27,13 @@ func (m *httpServerRequestMetricsV1) ObserveRequestDuration(method string, durat
 }
 
 func NewHTTPServerRequestMetricsV1() HTTPServerRequestMetricsV1 {
-	return NewHttpServerRequestMetricsWithBucketsV1(DefaultDurationMsBuckets)
+	return NewHttpServerRequestMetricsWithBucketsV1(metrics.DefaultDurationMsBuckets)
 }
 
 func NewHttpServerRequestMetricsWithBucketsV1(requestTimeMsBuckets []float64) HTTPServerRequestMetricsV1 {
 	m := &httpServerRequestMetricsV1{
-		nbRequests:    newCounterVec(metricsNamespace, metricsSubsystemHttpServer, "nb_req", nil, []string{metricsLabelMethod, metricsLabelStatusCode, metricsLabelSupplierOldId}),
-		requestTimeMs: newHistogramVec(metricsNamespace, metricsSubsystemHttpServer, "req_duration_ms", nil, requestTimeMsBuckets, []string{metricsLabelMethod}),
+		nbRequests:    metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpServer, "nb_req", nil, []string{metrics.MetricsLabelMethod, metrics.MetricsLabelStatusCode, metrics.MetricsLabelSupplierOldId}),
+		requestTimeMs: metrics.NewHistogramVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpServer, "req_duration_ms", nil, requestTimeMsBuckets, []string{metrics.MetricsLabelMethod}),
 	}
 	return m
 }

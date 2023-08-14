@@ -16,18 +16,18 @@ type IDbMetrics interface {
 
 func NewDbMetrics(dbName string) IDbMetrics {
 	labels := map[string]string{
-		metricsLabelDatabase: dbName,
+		MetricsLabelDatabase: dbName,
 	}
 
 	return &dbMetrics{
-		nbMaxConns:        newGauge(metricsNamespace, metricsSubsystemDb, "max_conns", labels),
-		nbOpenConns:       newGauge(metricsNamespace, metricsSubsystemDb, "open_conns", labels),
-		nbUsedConns:       newGauge(metricsNamespace, metricsSubsystemDb, "used_conns", labels),
-		waitCount:         newGauge(metricsNamespace, metricsSubsystemDb, "wait_count", labels),
-		waitDurationMs:    newSummary(metricsNamespace, metricsSubsystemDb, "wait_duration_count", labels),
-		maxIdleClosed:     newCounter(metricsNamespace, metricsSubsystemDb, "max_idle_closed", labels),
-		maxIdleTimeClosed: newCounter(metricsNamespace, metricsSubsystemDb, "max_idle_time_closed", labels),
-		maxLifetimeClosed: newCounter(metricsNamespace, metricsSubsystemDb, "max_lifetime_closed", labels),
+		nbMaxConns:        NewGauge(MetricsNamespace, metricsSubsystemDb, "max_conns", labels),
+		nbOpenConns:       NewGauge(MetricsNamespace, metricsSubsystemDb, "open_conns", labels),
+		nbUsedConns:       NewGauge(MetricsNamespace, metricsSubsystemDb, "used_conns", labels),
+		waitCount:         NewGauge(MetricsNamespace, metricsSubsystemDb, "wait_count", labels),
+		waitDurationMs:    NewSummary(MetricsNamespace, metricsSubsystemDb, "wait_duration_count", labels),
+		maxIdleClosed:     NewCounter(MetricsNamespace, metricsSubsystemDb, "max_idle_closed", labels),
+		maxIdleTimeClosed: NewCounter(MetricsNamespace, metricsSubsystemDb, "max_idle_time_closed", labels),
+		maxLifetimeClosed: NewCounter(MetricsNamespace, metricsSubsystemDb, "max_lifetime_closed", labels),
 	}
 }
 
