@@ -1,16 +1,14 @@
-package metrics
+package v1
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
 	"strconv"
 	"time"
+
+	"github.com/happywbfriends/metrics/metrics"
 )
 
-const (
-	MetricsSubsystemHttpClt = "http_clt"
-)
-
-type IHttpClientRequestMetrics interface {
+type HttpClientRequestMetrics interface {
 	IncDone(statusCode int)
 	IncError(e error)
 	RequestDuration(duration time.Duration)
@@ -22,20 +20,20 @@ func (m *NoHttpClientMetrics) IncDone(int)                   {}
 func (m *NoHttpClientMetrics) IncError(error)                {}
 func (m *NoHttpClientMetrics) RequestDuration(time.Duration) {}
 
-func NewHttpClientRequestMetrics(clientName, methodName string) IHttpClientRequestMetrics {
-	return NewHttpClientRequestMetricsWithBuckets(clientName, methodName, DefaultDurationMsBuckets)
+func NewHttpClientRequestMetrics(clientName, methodName string) HttpClientRequestMetrics {
+	return NewHttpClientRequestMetricsWithBuckets(clientName, methodName, metrics.DefaultDurationMsBuckets)
 }
 
-func NewHttpClientRequestMetricsWithBuckets(clientName, methodName string, requestTimeMsBuckets []float64) IHttpClientRequestMetrics {
+func NewHttpClientRequestMetricsWithBuckets(clientName, methodName string, requestTimeMsBuckets []float64) HttpClientRequestMetrics {
 	labels := map[string]string{
-		MetricsLabelClient: clientName,
-		MetricsLabelMethod: methodName,
+		metrics.MetricsLabelClient: clientName,
+		metrics.MetricsLabelMethod: methodName,
 	}
 
 	m := &httpClientMetrics{
-		nbDone:        NewCounterVec(MetricsNamespace, MetricsSubsystemHttpClt, "nb_req_done", labels, []string{MetricsLabelStatusCode}),
-		nbError:       NewCounter(MetricsNamespace, MetricsSubsystemHttpClt, "nb_req_error", labels),
-		requestTimeMs: NewHistogram(MetricsNamespace, MetricsSubsystemHttpClt, "req_duration_ms", labels, requestTimeMsBuckets),
+		nbDone:        metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_done", labels, []string{metrics.MetricsLabelStatusCode}),
+		nbError:       metrics.NewCounter(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_error", labels),
+		requestTimeMs: metrics.NewHistogram(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "req_duration_ms", labels, requestTimeMsBuckets),
 	}
 
 	m.nbDone200 = m.nbDone.WithLabelValues("200") // recommended optimization
