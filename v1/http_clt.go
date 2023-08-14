@@ -25,7 +25,7 @@ func NewHttpClientRequestMetricsWithBuckets(requestTimeMsBuckets []float64) Http
 type HttpClientMetrics interface {
 	IncNbDone(client string, method string, statusCode int)
 	IncNbError(client string, method string)
-	RequestDuration(client string, method string, t time.Duration)
+	ObserveRequestDuration(client string, method string, t time.Duration)
 }
 
 type httpClientMetrics struct {
@@ -42,6 +42,6 @@ func (m *httpClientMetrics) IncNbError(client string, method string) {
 	m.nbError.WithLabelValues(client, method).Inc()
 }
 
-func (m *httpClientMetrics) RequestDuration(client string, method string, t time.Duration) {
+func (m *httpClientMetrics) ObserveRequestDuration(client string, method string, t time.Duration) {
 	m.requestTimeMs.WithLabelValues(client, method).Observe(float64(t.Milliseconds()))
 }
