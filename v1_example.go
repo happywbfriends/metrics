@@ -20,10 +20,7 @@ func v1HTTPServerExample() {
 		timeBegin := time.Now()
 		status := http.StatusOK
 		defer func() {
-			if status == http.StatusOK {
-				httpServerMetrics.ObserveOkRequestDuration(method, supplierOldId, time.Since(timeBegin))
-			}
-
+			httpServerMetrics.ObserveRequestDuration(method, status, supplierOldId, time.Since(timeBegin))
 			httpServerMetrics.IncNbRequest(method, status, supplierOldId)
 		}()
 
