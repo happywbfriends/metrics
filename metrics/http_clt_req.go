@@ -35,7 +35,7 @@ func NewHttpClientRequestMetricsWithBuckets(clientName, methodName string, reque
 	m := &httpClientMetrics{
 		nbDone:        NewCounterVec(MetricsNamespace, metricsSubsystemHttpClt, "nb_req_done", labels, []string{MetricsLabelStatusCode}),
 		nbError:       NewCounter(MetricsNamespace, metricsSubsystemHttpClt, "nb_req_error", labels),
-		requestTimeMs: newHistogram(MetricsNamespace, metricsSubsystemHttpClt, "req_duration_ms", labels, requestTimeMsBuckets),
+		requestTimeMs: NewHistogram(MetricsNamespace, metricsSubsystemHttpClt, "req_duration_ms", labels, requestTimeMsBuckets),
 	}
 
 	m.nbDone200 = m.nbDone.WithLabelValues("200") // recommended optimization

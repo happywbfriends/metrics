@@ -28,7 +28,7 @@ func NewHttpServerRequestMetricsWithBuckets(methodName string, requestTimeMsBuck
 	}
 	m := &httpServerRequestMetrics{
 		nbRequests:    NewCounterVec(MetricsNamespace, MetricsSubsystemHttpServer, "nb_req", labels, []string{MetricsLabelStatusCode, MetricsLabelSupplierOldId}),
-		requestTimeMs: newHistogram(MetricsNamespace, MetricsSubsystemHttpServer, "req_duration_ms", labels, requestTimeMsBuckets),
+		requestTimeMs: NewHistogram(MetricsNamespace, MetricsSubsystemHttpServer, "req_duration_ms", labels, requestTimeMsBuckets),
 	}
 	return m
 }

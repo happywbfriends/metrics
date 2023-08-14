@@ -20,7 +20,7 @@ func NewDbQueryMetrics(dbName, queryName string) IDbQueryMetrics {
 	}
 
 	return &dbRequestMetrics{
-		durationMs: newHistogram(MetricsNamespace, metricsSubsystemDbQuery, "duration_ms", labels, DefaultDurationMsBuckets),
+		durationMs: NewHistogram(MetricsNamespace, metricsSubsystemDbQuery, "duration_ms", labels, DefaultDurationMsBuckets),
 		nbDone:     NewCounter(MetricsNamespace, metricsSubsystemDbQuery, "nb_done", labels),
 		nbError:    NewCounter(MetricsNamespace, metricsSubsystemDbQuery, "nb_error", labels),
 	}
