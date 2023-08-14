@@ -51,7 +51,7 @@ func sqlDbExample() {
 	db, _ := sql.Open("postgres", "...connection string...")
 	defer db.Close()
 
-	// запускаем считываение основных метрик инстанса БД раз в 5 сек
+	// запускаем считывание основных метрик инстанса БД раз в 5 сек
 	dbMetrics := metrics.NewDbMetrics("MyDatabase")
 	go metrics.DbMetricsHelper(dbMetrics, db, 5*time.Second, ctx)
 
