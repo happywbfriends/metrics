@@ -9,11 +9,24 @@ import (
 func v1HTTPServerExample() {
 	supplierOldId := 999
 
-	timeBegin := time.Now()
-	status := http.StatusNotFound
 	httpServerMetrics := metricsv1.NewHTTPServerMetrics()
-	httpServerMetrics.IncNbRequest("POST/foo", status, supplierOldId)
-	if status == http.StatusOK {
-		httpServerMetrics.ObserveOkRequestDuration("POST/foo", time.Since(timeBegin))
-	}
+
+	// Обработчик /bar
+	http.HandleFunc("GET/bar", func(w http.ResponseWriter, r *http.Request) {
+		method := "GET/bar"
+		httpServerMetrics.IncNbConnections()
+		defer httpServerMetrics.DecNbConnections()
+
+		timeBegin := time.Now()
+		status := http.StatusOK
+		defer func() {
+			if status == http.StatusOK {
+				httpServerMetrics.ObserveOkRequestDuration(method, time.Since(timeBegin))
+			}
+
+			httpServerMetrics.IncNbRequest(method, status, supplierOldId)
+		}()
+
+		w.WriteHeader(status)
+	})
 }
