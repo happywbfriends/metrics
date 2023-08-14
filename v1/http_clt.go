@@ -8,23 +8,11 @@ import (
 	"github.com/happywbfriends/metrics/metrics"
 )
 
-type HttpClientRequestMetrics interface {
-	IncDone(statusCode int)
-	IncError(e error)
-	RequestDuration(duration time.Duration)
-}
-
-type NoHttpClientMetrics struct{}
-
-func (m *NoHttpClientMetrics) IncDone(int)                   {}
-func (m *NoHttpClientMetrics) IncError(error)                {}
-func (m *NoHttpClientMetrics) RequestDuration(time.Duration) {}
-
-func NewHttpClientRequestMetrics(clientName, methodName string) HttpClientRequestMetrics {
+func NewHttpClientMetrics(clientName, methodName string) HttpClientMetrics {
 	return NewHttpClientRequestMetricsWithBuckets(clientName, methodName, metrics.DefaultDurationMsBuckets)
 }
 
-func NewHttpClientRequestMetricsWithBuckets(clientName, methodName string, requestTimeMsBuckets []float64) HttpClientRequestMetrics {
+func NewHttpClientRequestMetricsWithBuckets(clientName, methodName string, requestTimeMsBuckets []float64) HttpClientMetrics {
 	labels := map[string]string{
 		metrics.MetricsLabelClient: clientName,
 		metrics.MetricsLabelMethod: methodName,
@@ -39,6 +27,12 @@ func NewHttpClientRequestMetricsWithBuckets(clientName, methodName string, reque
 	m.nbDone200 = m.nbDone.WithLabelValues("200") // recommended optimization
 
 	return m
+}
+
+type HttpClientMetrics interface {
+	IncDone(statusCode int)
+	IncError(e error)
+	RequestDuration(duration time.Duration)
 }
 
 type httpClientMetrics struct {
