@@ -8,30 +8,30 @@ import (
 	"github.com/happywbfriends/metrics/metrics"
 )
 
-func NewHTTPServerRequestMetrics() HTTPServerRequestMetrics {
-	return NewHttpServerRequestMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
+func NewHTTPServerMetrics() HTTPServerMetrics {
+	return NewHttpServerMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
 }
 
-type HTTPServerRequestMetrics interface {
+type HTTPServerMetrics interface {
 	IncNbRequest(method string, statusCode int, supplierOldId int)
 	ObserveRequestDuration(method string, duration time.Duration)
 }
 
-type httpServerRequestMetrics struct {
+type httpServerMetrics struct {
 	nbRequests    *prometheus.CounterVec
 	requestTimeMs *prometheus.HistogramVec
 }
 
-func (m *httpServerRequestMetrics) IncNbRequest(method string, statusCode int, supplierOldId int) {
+func (m *httpServerMetrics) IncNbRequest(method string, statusCode int, supplierOldId int) {
 	m.nbRequests.WithLabelValues(method, strconv.Itoa(statusCode), strconv.Itoa(supplierOldId)).Inc()
 }
 
-func (m *httpServerRequestMetrics) ObserveRequestDuration(method string, duration time.Duration) {
+func (m *httpServerMetrics) ObserveRequestDuration(method string, duration time.Duration) {
 	m.requestTimeMs.WithLabelValues(method).Observe(float64(duration.Milliseconds()))
 }
 
-func NewHttpServerRequestMetricsWithBuckets(requestTimeMsBuckets []float64) HTTPServerRequestMetrics {
-	m := &httpServerRequestMetrics{
+func NewHttpServerMetricsWithBuckets(requestTimeMsBuckets []float64) HTTPServerMetrics {
+	m := &httpServerMetrics{
 		nbRequests:    metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpServer, "nb_req", nil, []string{metrics.MetricsLabelMethod, metrics.MetricsLabelStatusCode, metrics.MetricsLabelSupplierOldId}),
 		requestTimeMs: metrics.NewHistogramVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpServer, "req_duration_ms", nil, requestTimeMsBuckets, []string{metrics.MetricsLabelMethod}),
 	}
