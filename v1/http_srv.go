@@ -14,7 +14,7 @@ func NewHTTPServerMetrics() HTTPServerMetrics {
 
 type HTTPServerMetrics interface {
 	IncNbRequest(method string, statusCode int, supplierOldId int)
-	ObserveRequestDuration(method string, duration time.Duration)
+	ObserveOkRequestDuration(method string, duration time.Duration)
 }
 
 type httpServerMetrics struct {
@@ -26,7 +26,7 @@ func (m *httpServerMetrics) IncNbRequest(method string, statusCode int, supplier
 	m.nbRequests.WithLabelValues(method, strconv.Itoa(statusCode), strconv.Itoa(supplierOldId)).Inc()
 }
 
-func (m *httpServerMetrics) ObserveRequestDuration(method string, duration time.Duration) {
+func (m *httpServerMetrics) ObserveOkRequestDuration(method string, duration time.Duration) {
 	m.requestTimeMs.WithLabelValues(method).Observe(float64(duration.Milliseconds()))
 }
 
