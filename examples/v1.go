@@ -58,3 +58,28 @@ func sqlDbExample() {
 	dbMetrics := metricsv1.NewDbMetrics("MyDatabase")
 	go metricsv1.DbMetricsHelper(dbMetrics, db, 5*time.Second, ctx)
 }
+
+func sqlDbQueryExample() {
+	db, _ := sql.Open("postgres", "...connection string...")
+	defer db.Close()
+
+	dbQueryMetrics := metricsv1.NewDbQueryMetrics()
+	_ = executeSomeUsefulQuery(db, dbQueryMetrics)
+}
+
+func executeSomeUsefulQuery(_ *sql.DB, m metricsv1.DbQueryMetrics) (e error) {
+	db_name := "MyDatabase"
+	query_name := "UsefulQuery"
+	defer func(timeBegin time.Time) {
+		m.ObserveRequestDuration(db_name, query_name, time.Since(timeBegin))
+		if e != nil {
+			m.IncNbError(db_name, query_name)
+		} else {
+			m.IncNbDone(db_name, query_name)
+		}
+	}(time.Now())
+
+	// do something in db
+
+	return nil
+}
