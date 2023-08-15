@@ -1,4 +1,4 @@
-package metrics
+package v1
 
 import (
 	"context"
@@ -6,28 +6,28 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"sync/atomic"
 	"time"
+
+	"github.com/happywbfriends/metrics/metrics"
 )
 
-const MetricsSubsystemDb = "db"
-
-type IDbMetrics interface {
+type DbMetrics interface {
 	Update(stats sql.DBStats)
 }
 
-func NewDbMetrics(dbName string) IDbMetrics {
+func NewDbMetrics(dbName string) DbMetrics {
 	labels := map[string]string{
-		MetricsLabelDatabase: dbName,
+		MetricsLabelSubject: dbName,
 	}
 
 	return &dbMetrics{
-		nbMaxConns:        NewGauge(MetricsNamespace, MetricsSubsystemDb, "max_conns", labels),
-		nbOpenConns:       NewGauge(MetricsNamespace, MetricsSubsystemDb, "open_conns", labels),
-		nbUsedConns:       NewGauge(MetricsNamespace, MetricsSubsystemDb, "used_conns", labels),
-		waitCount:         NewGauge(MetricsNamespace, MetricsSubsystemDb, "wait_count", labels),
-		waitDurationMs:    NewSummary(MetricsNamespace, MetricsSubsystemDb, "wait_duration_count", labels),
-		maxIdleClosed:     NewCounter(MetricsNamespace, MetricsSubsystemDb, "max_idle_closed", labels),
-		maxIdleTimeClosed: NewCounter(MetricsNamespace, MetricsSubsystemDb, "max_idle_time_closed", labels),
-		maxLifetimeClosed: NewCounter(MetricsNamespace, MetricsSubsystemDb, "max_lifetime_closed", labels),
+		nbMaxConns:        metrics.NewGauge(metrics.MetricsNamespace, metrics.MetricsSubsystemDb, "max_conns", labels),
+		nbOpenConns:       metrics.NewGauge(metrics.MetricsNamespace, metrics.MetricsSubsystemDb, "open_conns", labels),
+		nbUsedConns:       metrics.NewGauge(metrics.MetricsNamespace, metrics.MetricsSubsystemDb, "used_conns", labels),
+		waitCount:         metrics.NewGauge(metrics.MetricsNamespace, metrics.MetricsSubsystemDb, "wait_count", labels),
+		waitDurationMs:    metrics.NewSummary(metrics.MetricsNamespace, metrics.MetricsSubsystemDb, "wait_duration_count", labels),
+		maxIdleClosed:     metrics.NewCounter(metrics.MetricsNamespace, metrics.MetricsSubsystemDb, "max_idle_closed", labels),
+		maxIdleTimeClosed: metrics.NewCounter(metrics.MetricsNamespace, metrics.MetricsSubsystemDb, "max_idle_time_closed", labels),
+		maxLifetimeClosed: metrics.NewCounter(metrics.MetricsNamespace, metrics.MetricsSubsystemDb, "max_lifetime_closed", labels),
 	}
 }
 
@@ -66,7 +66,7 @@ func (d *dbMetrics) Update(stats sql.DBStats) {
 	}
 }
 
-func DbMetricsHelper(m IDbMetrics, db *sql.DB, updateFreq time.Duration, ctx context.Context) {
+func DbMetricsHelper(m DbMetrics, db *sql.DB, updateFreq time.Duration, ctx context.Context) {
 	ticker := time.NewTicker(updateFreq)
 	defer ticker.Stop()
 

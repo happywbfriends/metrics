@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	metricsSubsystemHttpClt = "http_clt"
+	MetricsSubsystemHttpClt = "http_clt"
 )
 
 type IHttpClientRequestMetrics interface {
@@ -33,9 +33,9 @@ func NewHttpClientRequestMetricsWithBuckets(clientName, methodName string, reque
 	}
 
 	m := &httpClientMetrics{
-		nbDone:        NewCounterVec(MetricsNamespace, metricsSubsystemHttpClt, "nb_req_done", labels, []string{MetricsLabelStatusCode}),
-		nbError:       NewCounter(MetricsNamespace, metricsSubsystemHttpClt, "nb_req_error", labels),
-		requestTimeMs: NewHistogram(MetricsNamespace, metricsSubsystemHttpClt, "req_duration_ms", labels, requestTimeMsBuckets),
+		nbDone:        NewCounterVec(MetricsNamespace, MetricsSubsystemHttpClt, "nb_req_done", labels, []string{MetricsLabelStatusCode}),
+		nbError:       NewCounter(MetricsNamespace, MetricsSubsystemHttpClt, "nb_req_error", labels),
+		requestTimeMs: NewHistogram(MetricsNamespace, MetricsSubsystemHttpClt, "req_duration_ms", labels, requestTimeMsBuckets),
 	}
 
 	m.nbDone200 = m.nbDone.WithLabelValues("200") // recommended optimization
