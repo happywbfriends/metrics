@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const metricsSubsystemDbQuery = "db_query"
+const MetricsSubsystemDbQuery = "db_query"
 
 type IDbQueryMetrics interface {
 	QueryDuration(time.Duration)
@@ -20,9 +20,9 @@ func NewDbQueryMetrics(dbName, queryName string) IDbQueryMetrics {
 	}
 
 	return &dbRequestMetrics{
-		durationMs: NewHistogram(MetricsNamespace, metricsSubsystemDbQuery, "duration_ms", labels, DefaultDurationMsBuckets),
-		nbDone:     NewCounter(MetricsNamespace, metricsSubsystemDbQuery, "nb_done", labels),
-		nbError:    NewCounter(MetricsNamespace, metricsSubsystemDbQuery, "nb_error", labels),
+		durationMs: NewHistogram(MetricsNamespace, MetricsSubsystemDbQuery, "duration_ms", labels, DefaultDurationMsBuckets),
+		nbDone:     NewCounter(MetricsNamespace, MetricsSubsystemDbQuery, "nb_done", labels),
+		nbError:    NewCounter(MetricsNamespace, MetricsSubsystemDbQuery, "nb_error", labels),
 	}
 }
 
