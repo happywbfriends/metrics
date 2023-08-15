@@ -14,18 +14,18 @@ func NewHttpClientMetrics() HttpClientMetrics {
 
 func NewHttpClientRequestMetricsWithBuckets(requestTimeMsBuckets []float64) HttpClientMetrics {
 	m := &httpClientMetrics{
-		nbDone:        metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_done", nil, []string{metrics.MetricsLabelClient, metrics.MetricsLabelMethod, metrics.MetricsLabelStatusCode}),
-		nbError:       metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_error", nil, []string{metrics.MetricsLabelClient, metrics.MetricsLabelMethod}),
-		requestTimeMs: metrics.NewHistogramVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "req_duration_ms", nil, requestTimeMsBuckets, []string{metrics.MetricsLabelClient, metrics.MetricsLabelMethod}),
+		nbDone:        metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_done", nil, []string{MetricsLabelSubject, metrics.MetricsLabelMethod, metrics.MetricsLabelStatusCode}),
+		nbError:       metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_error", nil, []string{MetricsLabelSubject, metrics.MetricsLabelMethod}),
+		requestTimeMs: metrics.NewHistogramVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "req_duration_ms", nil, requestTimeMsBuckets, []string{MetricsLabelSubject, metrics.MetricsLabelMethod}),
 	}
 
 	return m
 }
 
 type HttpClientMetrics interface {
-	IncNbDone(client string, method string, statusCode int)
-	IncNbError(client string, method string)
-	ObserveRequestDuration(client string, method string, t time.Duration)
+	IncNbDone(subject string, method string, statusCode int)
+	IncNbError(subject string, method string)
+	ObserveRequestDuration(subject string, method string, t time.Duration)
 }
 
 type httpClientMetrics struct {
@@ -34,14 +34,14 @@ type httpClientMetrics struct {
 	requestTimeMs *prometheus.HistogramVec
 }
 
-func (m *httpClientMetrics) IncNbDone(client string, method string, statusCode int) {
-	m.nbDone.WithLabelValues(client, method, strconv.Itoa(statusCode)).Inc()
+func (m *httpClientMetrics) IncNbDone(subject string, method string, statusCode int) {
+	m.nbDone.WithLabelValues(subject, method, strconv.Itoa(statusCode)).Inc()
 }
 
-func (m *httpClientMetrics) IncNbError(client string, method string) {
-	m.nbError.WithLabelValues(client, method).Inc()
+func (m *httpClientMetrics) IncNbError(subject string, method string) {
+	m.nbError.WithLabelValues(subject, method).Inc()
 }
 
-func (m *httpClientMetrics) ObserveRequestDuration(client string, method string, t time.Duration) {
-	m.requestTimeMs.WithLabelValues(client, method).Observe(float64(t.Milliseconds()))
+func (m *httpClientMetrics) ObserveRequestDuration(subject string, method string, t time.Duration) {
+	m.requestTimeMs.WithLabelValues(subject, method).Observe(float64(t.Milliseconds()))
 }
