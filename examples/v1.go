@@ -1,13 +1,15 @@
 package main
 
 import (
+	"context"
+	"database/sql"
 	"errors"
 	metricsv1 "github.com/happywbfriends/metrics/v1"
 	"net/http"
 	"time"
 )
 
-func v1HTTPServerExample() {
+func HTTPServerExample() {
 	supplierOldId := 999
 
 	httpServerMetrics := metricsv1.NewHTTPServerMetrics()
@@ -29,7 +31,7 @@ func v1HTTPServerExample() {
 	})
 }
 
-func v1HTTPClientExample() {
+func HTTPClientExample() {
 	httpServerMetrics := metricsv1.NewHttpClientMetrics()
 
 	timeBegin := time.Now()
@@ -43,4 +45,16 @@ func v1HTTPClientExample() {
 	if err != nil {
 		httpServerMetrics.IncNbError(client, method)
 	}
+}
+
+func sqlDbExample() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	db, _ := sql.Open("postgres", "...connection string...")
+	defer db.Close()
+
+	// запускаем считывание основных метрик инстанса БД раз в 5 сек
+	dbMetrics := metricsv1.NewDbMetrics("MyDatabase")
+	go metricsv1.DbMetricsHelper(dbMetrics, db, 5*time.Second, ctx)
 }
