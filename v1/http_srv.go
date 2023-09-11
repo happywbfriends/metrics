@@ -10,10 +10,10 @@ import (
 )
 
 func NewHTTPServerMetrics() HTTPServerMetrics {
-	return NewHttpServerMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
+	return NewHTTPServerMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
 }
 
-func NewHttpServerMetricsWithBuckets(requestTimeMsBuckets []float64) HTTPServerMetrics {
+func NewHTTPServerMetricsWithBuckets(requestTimeMsBuckets []float64) HTTPServerMetrics {
 	m := &httpServerMetrics{
 		nbRequests:    metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpServer, "nb_req", nil, []string{metrics.MetricsLabelMethod, metrics.MetricsLabelStatusCode, metrics.MetricsLabelSupplierOldId}),
 		requestTimeMs: metrics.NewHistogramVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpServer, "req_duration_ms", nil, requestTimeMsBuckets, []string{metrics.MetricsLabelMethod, metrics.MetricsLabelStatusCode, metrics.MetricsLabelSupplierOldId}),
@@ -28,6 +28,14 @@ type HTTPServerMetrics interface {
 	IncNbConnections()
 	DecNbConnections()
 }
+
+type NoHTTPServerMetrics struct{}
+
+func (m *NoHTTPServerMetrics) IncNbRequest(method string, statusCode int, supplierOldId int) {}
+func (m *NoHTTPServerMetrics) ObserveRequestDuration(method string, statusCode int, supplierOldId int, duration time.Duration) {
+}
+func (m *NoHTTPServerMetrics) IncNbConnections() {}
+func (m *NoHTTPServerMetrics) DecNbConnections() {}
 
 type httpServerMetrics struct {
 	nbRequests    *prometheus.CounterVec
