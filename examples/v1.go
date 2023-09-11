@@ -32,7 +32,7 @@ func HTTPServerExample() {
 }
 
 func HTTPClientExample() {
-	httpServerMetrics := metricsv1.NewHttpClientMetrics()
+	httpServerMetrics := metricsv1.NewHTTPClientMetrics()
 
 	timeBegin := time.Now()
 	client := "foo_api"

@@ -8,7 +8,7 @@ import (
 	"github.com/happywbfriends/metrics/metrics"
 )
 
-func NewHTTPClientMetrics() HttpClientMetrics {
+func NewHTTPClientMetrics() HTTPClientMetrics {
 	return NewHTTPServerMetricsClientRequestMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
 }
 
