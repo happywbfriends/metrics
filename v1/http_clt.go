@@ -8,11 +8,11 @@ import (
 	"github.com/happywbfriends/metrics/metrics"
 )
 
-func NewHttpClientMetrics() HttpClientMetrics {
-	return NewHttpClientRequestMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
+func NewHTTPClientMetrics() HttpClientMetrics {
+	return NewHTTPServerMetricsClientRequestMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
 }
 
-func NewHttpClientRequestMetricsWithBuckets(requestTimeMsBuckets []float64) HttpClientMetrics {
+func NewHTTPServerMetricsClientRequestMetricsWithBuckets(requestTimeMsBuckets []float64) HTTPClientMetrics {
 	m := &httpClientMetrics{
 		nbDone:        metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_done", nil, []string{MetricsLabelSubject, metrics.MetricsLabelMethod, metrics.MetricsLabelStatusCode}),
 		nbError:       metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_error", nil, []string{MetricsLabelSubject, metrics.MetricsLabelMethod}),
@@ -22,10 +22,17 @@ func NewHttpClientRequestMetricsWithBuckets(requestTimeMsBuckets []float64) Http
 	return m
 }
 
-type HttpClientMetrics interface {
+type HTTPClientMetrics interface {
 	IncNbDone(subject string, method string, statusCode int)
 	IncNbError(subject string, method string)
 	ObserveRequestDuration(subject string, method string, t time.Duration)
+}
+
+type NoHTTPClientMetrics struct{}
+
+func (m *NoHTTPClientMetrics) IncNbDone(subject string, method string, statusCode int) {}
+func (m *NoHTTPClientMetrics) IncNbError(subject string, method string)                {}
+func (m *NoHTTPClientMetrics) ObserveRequestDuration(subject string, method string, t time.Duration) {
 }
 
 type httpClientMetrics struct {
