@@ -6,10 +6,6 @@ import (
 )
 
 func NewKafkaMetrics() KafkaMetrics {
-	return NewKafkaMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
-}
-
-func NewKafkaMetricsWithBuckets(requestTimeMsBuckets []float64) KafkaMetrics {
 	m := kafkaMetrics{
 		nbMsgProduced:   metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemKafka, "nb_msg_produced", nil, []string{MetricsLabelTopic}),
 		nbErrorProduced: metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemKafka, "nb_error_produced", nil, []string{MetricsLabelTopic}),
