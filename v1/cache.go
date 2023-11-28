@@ -23,8 +23,8 @@ func MewCacheMetrics() CacheMetrics {
 type CacheMetrics interface {
 	IncNbReadHit(name string, shard int)
 	IncNbReadMiss(name string, shard int)
-	ObserveReadDurationHit(name string, shard int, t time.Duration)
-	ObserveReadDurationMiss(name string, shard int, t time.Duration)
+	ObserveReadHitDuration(name string, shard int, t time.Duration)
+	ObserveReadMissDuration(name string, shard int, t time.Duration)
 	IncNbWrite(name string, shard int)
 }
 
@@ -53,11 +53,11 @@ func (m *cacheMetrics) IncNbWrite(name string, shard int) {
 	m.nbWrite.WithLabelValues(name, strconv.Itoa(shard)).Inc()
 }
 
-func (m *cacheMetrics) ObserveReadDurationHit(name string, shard int, t time.Duration) {
+func (m *cacheMetrics) ObserveReadHitDuration(name string, shard int, t time.Duration) {
 	m.observeReadDuration(name, shard, "1", t)
 }
 
-func (m *cacheMetrics) ObserveReadDurationMiss(name string, shard int, t time.Duration) {
+func (m *cacheMetrics) ObserveReadMissDuration(name string, shard int, t time.Duration) {
 	m.observeReadDuration(name, shard, "0", t)
 }
 
