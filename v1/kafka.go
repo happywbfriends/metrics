@@ -5,7 +5,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func NewKafkaProducerMetrics() KafkaMetrics {
+func NewKafkaProducerMetrics() KafkaProducerMetrics {
 	m := kafkaMetrics{
 		nbDone:  metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemKafka, "nb_msg_produced", nil, []string{MetricsLabelTopic}),
 		nbError: metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemKafka, "nb_error_produced", nil, []string{MetricsLabelTopic}),
@@ -14,7 +14,7 @@ func NewKafkaProducerMetrics() KafkaMetrics {
 	return &m
 }
 
-func NewKafkaConsumerMetrics() KafkaMetrics {
+func NewKafkaConsumerMetrics() KafkaConsumerMetrics {
 	m := kafkaMetrics{
 		nbDone:  metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemKafka, "nb_msg_consumed", nil, []string{MetricsLabelTopic}),
 		nbError: metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemKafka, "nb_error_consumed", nil, []string{MetricsLabelTopic}),
@@ -23,7 +23,12 @@ func NewKafkaConsumerMetrics() KafkaMetrics {
 	return &m
 }
 
-type KafkaMetrics interface {
+type KafkaProducerMetrics interface {
+	IncNbDone(topic string)
+	IncNbError(topic string)
+}
+
+type KafkaConsumerMetrics interface {
 	IncNbDone(topic string)
 	IncNbError(topic string)
 }

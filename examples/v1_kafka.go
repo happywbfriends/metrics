@@ -12,7 +12,7 @@ func KafkaProducerExample() {
 	logger.SendMessage("test")
 }
 
-func newKafkaProducer(urls []string, clientID, user, password string, metrics metricsv1.KafkaMetrics) (sarama.AsyncProducer, error) {
+func newKafkaProducer(urls []string, clientID, user, password string, metrics metricsv1.KafkaProducerMetrics) (sarama.AsyncProducer, error) {
 	sarConf := sarama.NewConfig()
 	sarConf.ClientID = clientID
 	sarConf.Producer.RequiredAcks = sarama.NoResponse
