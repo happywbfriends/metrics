@@ -5,8 +5,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func NewKafkaProducerMetrics() KafkaProducerMetrics {
-	m := kafkaProducerMetrics{
+func NewKafkaProducerMetrics() KafkaMetrics {
+	m := kafkaMetrics{
 		nbDone:  metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemKafka, "nb_msg_produced", nil, []string{MetricsLabelTopic}),
 		nbError: metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemKafka, "nb_error_produced", nil, []string{MetricsLabelTopic}),
 	}
@@ -14,20 +14,29 @@ func NewKafkaProducerMetrics() KafkaProducerMetrics {
 	return &m
 }
 
-type KafkaProducerMetrics interface {
+func NewKafkaConsumerMetrics() KafkaMetrics {
+	m := kafkaMetrics{
+		nbDone:  metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemKafka, "nb_msg_consumed", nil, []string{MetricsLabelTopic}),
+		nbError: metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemKafka, "nb_error_consumed", nil, []string{MetricsLabelTopic}),
+	}
+
+	return &m
+}
+
+type KafkaMetrics interface {
 	IncNbDone(topic string)
 	IncNbError(topic string)
 }
 
-type kafkaProducerMetrics struct {
+type kafkaMetrics struct {
 	nbDone  *prometheus.CounterVec
 	nbError *prometheus.CounterVec
 }
 
-func (m *kafkaProducerMetrics) IncNbDone(topic string) {
+func (m *kafkaMetrics) IncNbDone(topic string) {
 	m.nbDone.WithLabelValues(topic).Inc()
 }
 
-func (m *kafkaProducerMetrics) IncNbError(topic string) {
+func (m *kafkaMetrics) IncNbError(topic string) {
 	m.nbError.WithLabelValues(topic).Inc()
 }
