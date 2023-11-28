@@ -6,7 +6,7 @@ import (
 )
 
 func KafkaProducerExample() {
-	metrics := metricsv1.NewKafkaMetrics()
+	metrics := metricsv1.NewKafkaProducerMetrics()
 	producer, _ := newKafkaProducer([]string{"kafka:9092"}, "clientID", "user", "password", metrics)
 	logger := newKafkaLogger(producer, "topic")
 	logger.SendMessage("test")
@@ -30,13 +30,13 @@ func newKafkaProducer(urls []string, clientID, user, password string, metrics me
 
 	go func() {
 		for msg := range producer.Successes() {
-			metrics.IncNbMsgProduced(msg.Topic)
+			metrics.IncNbDone(msg.Topic)
 		}
 	}()
 
 	go func() {
 		for err := range producer.Errors() {
-			metrics.IncNbErrorProduced(err.Msg.Topic)
+			metrics.IncNbError(err.Msg.Topic)
 		}
 	}()
 
