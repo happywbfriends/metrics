@@ -1,5 +1,7 @@
 package v1
 
 const (
-	MetricsLabelSubject = "subject"
+	MetricsLabelSubject   = "subject"
+	MetricsSubsystemKafka = "kafka"
+	MetricsLabelTopic     = "topic"
 )
