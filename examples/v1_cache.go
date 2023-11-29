@@ -35,7 +35,7 @@ func newCacheInt(name string, metrics metricsv1.CacheMetrics) CacheInt {
 	// Periodical cleanup
 	go c.cache.Start()
 
-	return c
+	return &c
 }
 
 type cacheInt struct {
@@ -44,11 +44,11 @@ type cacheInt struct {
 	metrics metricsv1.CacheMetrics
 }
 
-func (c cacheInt) Set(k string, v int) {
+func (c *cacheInt) Set(k string, v int) {
 	c.cache.Set(k, v, ttlcache.DefaultTTL)
 }
 
-func (c cacheInt) Get(k string) (int, bool) {
+func (c *cacheInt) Get(k string) (int, bool) {
 	item := c.cache.Get(k)
 	if item != nil {
 		c.metrics.IncNbReadHit(c.name, 0)
