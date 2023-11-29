@@ -54,6 +54,22 @@ func NewGauge(ns, subsystem, name string, labelsOpt map[string]string) prometheu
 	return m
 }
 
+func NewGaugeVec(ns, subsystem, name string, labelsOpt map[string]string, variableLabels []string) *prometheus.GaugeVec {
+	if len(labelsOpt) == 0 { // no empty maps
+		labelsOpt = nil
+	}
+
+	m := prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace:   ns,
+			Subsystem:   subsystem,
+			Name:        name,
+			ConstLabels: labelsOpt,
+		}, variableLabels)
+	prometheus.MustRegister(m)
+	return m
+}
+
 func NewSummary(ns, subsystem, name string, labelsOpt map[string]string) prometheus.Summary {
 
 	if len(labelsOpt) == 0 { // no empty maps
