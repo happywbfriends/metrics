@@ -50,6 +50,7 @@ func (c *cacheInt) Set(k string, v int) {
 }
 
 func (c *cacheInt) Get(k string) (int, bool) {
+	c.metrics.SetSize(c.name, 0, c.cache.Len())
 	item := c.cache.Get(k)
 	if item != nil {
 		c.metrics.IncNbReadHit(c.name, 0)
