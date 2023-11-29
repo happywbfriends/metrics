@@ -7,12 +7,13 @@ import (
 	"time"
 )
 
+var cacheBuckets = []float64{1.0, 5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0}
+
 func NewCacheMetrics() CacheMetrics {
-	buckets := metrics.DefaultDurationMsBuckets // todo
 	m := cacheMetrics{
 		nbRead:       metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemCache, "nb_read", nil, []string{MetricsLabelName, MetricsLabelShard, MetricsLabelHit}),
 		nbWrite:      metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemCache, "nb_write", nil, []string{MetricsLabelName, MetricsLabelShard}),
-		readDuration: metrics.NewHistogramVec(metrics.MetricsNamespace, MetricsSubsystemCache, "read_duration_ms", nil, buckets, []string{MetricsLabelName, MetricsLabelShard, MetricsLabelHit}),
+		readDuration: metrics.NewHistogramVec(metrics.MetricsNamespace, MetricsSubsystemCache, "read_duration_ms", nil, cacheBuckets, []string{MetricsLabelName, MetricsLabelShard, MetricsLabelHit}),
 		size:         metrics.NewGaugeVec(metrics.MetricsNamespace, MetricsSubsystemCache, "size", nil, []string{MetricsLabelName, MetricsLabelShard}),
 		maxSize:      metrics.NewGaugeVec(metrics.MetricsNamespace, MetricsSubsystemCache, "max_size", nil, []string{MetricsLabelName, MetricsLabelShard}),
 	}
