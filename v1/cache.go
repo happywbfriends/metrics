@@ -7,14 +7,14 @@ import (
 	"time"
 )
 
-func MewCacheMetrics() CacheMetrics {
+func NewCacheMetrics() CacheMetrics {
 	buckets := metrics.DefaultDurationMsBuckets // todo
 	m := cacheMetrics{
 		nbRead:       metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemCache, "nb_read", nil, []string{MetricsLabelName, MetricsLabelShard, MetricsLabelHit}),
 		nbWrite:      metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemCache, "nb_write", nil, []string{MetricsLabelName, MetricsLabelShard}),
 		readDuration: metrics.NewHistogramVec(metrics.MetricsNamespace, MetricsSubsystemCache, "read_duration_ms", nil, buckets, []string{MetricsLabelName, MetricsLabelShard, MetricsLabelHit}),
 		size:         metrics.NewGaugeVec(metrics.MetricsNamespace, MetricsSubsystemCache, "size", nil, []string{MetricsLabelName, MetricsLabelShard}),
-		maxSize:      nil,
+		maxSize:      metrics.NewGaugeVec(metrics.MetricsNamespace, MetricsSubsystemCache, "max_size", nil, []string{MetricsLabelName, MetricsLabelShard}),
 	}
 
 	return &m
