@@ -36,9 +36,8 @@ type cacheMetrics struct {
 	nbRead       *prometheus.CounterVec
 	nbWrite      *prometheus.CounterVec
 	readDuration *prometheus.HistogramVec
-	// todo - в каком методе обновлять?
-	size    *prometheus.GaugeVec
-	maxSize *prometheus.GaugeVec
+	size         *prometheus.GaugeVec
+	maxSize      *prometheus.GaugeVec
 }
 
 func (m *cacheMetrics) IncNbReadHit(name string, shard int) {

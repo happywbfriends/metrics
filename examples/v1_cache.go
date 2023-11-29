@@ -46,6 +46,7 @@ type cacheInt struct {
 
 func (c *cacheInt) Set(k string, v int) {
 	c.cache.Set(k, v, ttlcache.DefaultTTL)
+	c.metrics.IncSize(c.name, 0)
 }
 
 func (c *cacheInt) Get(k string) (int, bool) {
