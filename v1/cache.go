@@ -13,7 +13,7 @@ func NewCacheMetrics() CacheMetrics {
 	m := cacheMetrics{
 		nbRead:       metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemCache, "nb_read", nil, []string{MetricsLabelName, MetricsLabelShard, MetricsLabelHit}),
 		nbWrite:      metrics.NewCounterVec(metrics.MetricsNamespace, MetricsSubsystemCache, "nb_write", nil, []string{MetricsLabelName, MetricsLabelShard}),
-		readDuration: metrics.NewHistogramVec(metrics.MetricsNamespace, MetricsSubsystemCache, "read_duration_ms", nil, cacheBuckets, []string{MetricsLabelName, MetricsLabelShard, MetricsLabelHit}),
+		readDuration: metrics.NewHistogramVec(metrics.MetricsNamespace, MetricsSubsystemCache, "read_duration_ns", nil, cacheBuckets, []string{MetricsLabelName, MetricsLabelShard, MetricsLabelHit}),
 		size:         metrics.NewGaugeVec(metrics.MetricsNamespace, MetricsSubsystemCache, "size", nil, []string{MetricsLabelName, MetricsLabelShard}),
 		maxSize:      metrics.NewGaugeVec(metrics.MetricsNamespace, MetricsSubsystemCache, "max_size", nil, []string{MetricsLabelName, MetricsLabelShard}),
 	}
@@ -82,5 +82,5 @@ func (m *cacheMetrics) incNbRead(name string, shard int, hit string) {
 }
 
 func (m *cacheMetrics) observeReadDuration(name string, shard int, hit string, t time.Duration) {
-	m.readDuration.WithLabelValues(name, strconv.Itoa(shard), hit).Observe(float64(t.Milliseconds()))
+	m.readDuration.WithLabelValues(name, strconv.Itoa(shard), hit).Observe(float64(t.Nanoseconds()))
 }
