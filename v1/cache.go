@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var cacheBuckets = []float64{1.0, 5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0}
+var cacheBuckets = []float64{500.0, 1_000.0, 5_000.0, 10_000.0, 50_000.0}
 
 func NewCacheMetrics() CacheMetrics {
 	m := cacheMetrics{
