@@ -57,13 +57,13 @@ func (m *httpServerMetrics) ObserveRequestDuration(method string, statusCode int
 }
 
 // IncNbConnections увеличивает количество активных соединений
-// Использовать или в явном виде, или через использование хука OnStateChange
+// Использовать или в явном виде, или через хук OnStateChange
 func (m *httpServerMetrics) IncNbConnections() {
 	m.nbConnections.Inc()
 }
 
 // DecNbConnections уменьшает количество активных соединений
-// Использовать или в явном виде, или через использование хука OnStateChange
+// Использовать или в явном виде, или через хук OnStateChange
 func (m *httpServerMetrics) DecNbConnections() {
 	m.nbConnections.Dec()
 }
