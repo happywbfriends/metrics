@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"net"
 	"net/http"
 	"strconv"
 	"time"
@@ -27,6 +28,7 @@ type HTTPServerMetrics interface {
 	ObserveRequestDuration(method string, statusCode int, supplierOldId int, duration time.Duration)
 	IncNbConnections()
 	DecNbConnections()
+	OnStateChange(conn net.Conn, state http.ConnState)
 }
 
 type NoHTTPServerMetrics struct{}
@@ -34,8 +36,9 @@ type NoHTTPServerMetrics struct{}
 func (m *NoHTTPServerMetrics) IncNbRequest(method string, statusCode int, supplierOldId int) {}
 func (m *NoHTTPServerMetrics) ObserveRequestDuration(method string, statusCode int, supplierOldId int, duration time.Duration) {
 }
-func (m *NoHTTPServerMetrics) IncNbConnections() {}
-func (m *NoHTTPServerMetrics) DecNbConnections() {}
+func (m *NoHTTPServerMetrics) IncNbConnections()                          {}
+func (m *NoHTTPServerMetrics) DecNbConnections()                          {}
+func (m *NoHTTPServerMetrics) OnStateChange(_ net.Conn, _ http.ConnState) {}
 
 type httpServerMetrics struct {
 	nbRequests    *prometheus.CounterVec
@@ -53,10 +56,25 @@ func (m *httpServerMetrics) ObserveRequestDuration(method string, statusCode int
 	}
 }
 
+// IncNbConnections увеличивает количество активных соединений
+// Использовать или в явном виде, или через хук OnStateChange
 func (m *httpServerMetrics) IncNbConnections() {
 	m.nbConnections.Inc()
 }
 
+// DecNbConnections уменьшает количество активных соединений
+// Использовать или в явном виде, или через хук OnStateChange
 func (m *httpServerMetrics) DecNbConnections() {
 	m.nbConnections.Dec()
+}
+
+// OnStateChange это хук для обновления количества активных соединений
+// При использовании хука отпадает необходимость дергать IncNbConnections и DecNbConnections в явном виде
+func (m *httpServerMetrics) OnStateChange(_ net.Conn, state http.ConnState) {
+	switch state {
+	case http.StateNew:
+		m.IncNbConnections()
+	case http.StateHijacked, http.StateClosed:
+		m.DecNbConnections()
+	}
 }

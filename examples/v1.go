@@ -9,28 +9,6 @@ import (
 	"time"
 )
 
-func HTTPServerExample() {
-	supplierOldId := 999
-
-	httpServerMetrics := metricsv1.NewHTTPServerMetrics()
-
-	// Обработчик /bar
-	http.HandleFunc("GET/bar", func(w http.ResponseWriter, r *http.Request) {
-		httpServerMetrics.IncNbConnections()
-		defer httpServerMetrics.DecNbConnections()
-
-		timeBegin := time.Now()
-		method := "GET/bar"
-		status := http.StatusOK
-		defer func() {
-			httpServerMetrics.ObserveRequestDuration(method, status, supplierOldId, time.Since(timeBegin))
-			httpServerMetrics.IncNbRequest(method, status, supplierOldId)
-		}()
-
-		w.WriteHeader(status)
-	})
-}
-
 func HTTPClientExample() {
 	httpServerMetrics := metricsv1.NewHTTPClientMetrics()
 
