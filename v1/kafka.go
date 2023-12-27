@@ -28,10 +28,20 @@ type KafkaProducerMetrics interface {
 	IncNbError(topic string)
 }
 
+type NoKafkaProducerMetrics struct{}
+
+func (NoKafkaProducerMetrics) IncNbDone(topic string)  {}
+func (NoKafkaProducerMetrics) IncNbError(topic string) {}
+
 type KafkaConsumerMetrics interface {
 	IncNbDone(topic string)
 	IncNbError(topic string)
 }
+
+type NoKafkaConsumerMetrics struct{}
+
+func (NoKafkaConsumerMetrics) IncNbDone(topic string)  {}
+func (NoKafkaConsumerMetrics) IncNbError(topic string) {}
 
 type kafkaMetrics struct {
 	nbDone  *prometheus.CounterVec

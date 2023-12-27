@@ -20,6 +20,13 @@ type DbQueryMetrics interface {
 	ObserveRequestDuration(subject string, query string, duration time.Duration)
 }
 
+type NoDbQueryMetrics struct{}
+
+func (NoDbQueryMetrics) IncNbDone(subject string, query string)  {}
+func (NoDbQueryMetrics) IncNbError(subject string, query string) {}
+func (NoDbQueryMetrics) ObserveRequestDuration(subject string, query string, duration time.Duration) {
+}
+
 type dbRequestMetrics struct {
 	nbDone     *prometheus.CounterVec
 	nbError    *prometheus.CounterVec
