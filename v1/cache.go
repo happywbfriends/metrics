@@ -33,6 +33,18 @@ type CacheMetrics interface {
 	SetMaxSize(name string, shard int, size int)
 }
 
+type NoCacheMetrics struct{}
+
+func (NoCacheMetrics) IncNbReadHit(name string, shard int)                             {}
+func (NoCacheMetrics) IncNbReadMiss(name string, shard int)                            {}
+func (NoCacheMetrics) ObserveReadHitDuration(name string, shard int, t time.Duration)  {}
+func (NoCacheMetrics) ObserveReadMissDuration(name string, shard int, t time.Duration) {}
+func (NoCacheMetrics) IncNbWrite(name string, shard int)                               {}
+func (NoCacheMetrics) SetSize(name string, shard int, size int)                        {}
+func (NoCacheMetrics) IncSize(name string, shard int)                                  {}
+func (NoCacheMetrics) DecSize(name string, shard int)                                  {}
+func (NoCacheMetrics) SetMaxSize(name string, shard int, size int)                     {}
+
 type cacheMetrics struct {
 	nbRead       *prometheus.CounterVec
 	nbWrite      *prometheus.CounterVec
