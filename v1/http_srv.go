@@ -24,8 +24,8 @@ func NewHTTPServerMetricsWithBuckets(requestTimeMsBuckets []float64) HTTPServerM
 }
 
 type HTTPServerMetrics interface {
-	IncNbRequest(method string, statusCode int, clientId int)
-	ObserveRequestDuration(method string, statusCode int, clientId int, duration time.Duration)
+	IncNbRequest(method string, statusCode int, clientId string)
+	ObserveRequestDuration(method string, statusCode int, clientId string, duration time.Duration)
 	IncNbConnections()
 	DecNbConnections()
 	OnStateChange(conn net.Conn, state http.ConnState)
@@ -33,8 +33,8 @@ type HTTPServerMetrics interface {
 
 type NoHTTPServerMetrics struct{}
 
-func (m *NoHTTPServerMetrics) IncNbRequest(method string, statusCode int, clientId int) {}
-func (m *NoHTTPServerMetrics) ObserveRequestDuration(method string, statusCode int, clientId int, duration time.Duration) {
+func (m *NoHTTPServerMetrics) IncNbRequest(method string, statusCode int, clientId string) {}
+func (m *NoHTTPServerMetrics) ObserveRequestDuration(method string, statusCode int, clientId string, duration time.Duration) {
 }
 func (m *NoHTTPServerMetrics) IncNbConnections()                          {}
 func (m *NoHTTPServerMetrics) DecNbConnections()                          {}
@@ -46,13 +46,13 @@ type httpServerMetrics struct {
 	nbConnections prometheus.Gauge
 }
 
-func (m *httpServerMetrics) IncNbRequest(method string, statusCode int, clientId int) {
-	m.nbRequests.WithLabelValues(method, strconv.Itoa(statusCode), strconv.Itoa(clientId)).Inc()
+func (m *httpServerMetrics) IncNbRequest(method string, statusCode int, clientId string) {
+	m.nbRequests.WithLabelValues(method, strconv.Itoa(statusCode), clientId).Inc()
 }
 
-func (m *httpServerMetrics) ObserveRequestDuration(method string, statusCode int, clientId int, duration time.Duration) {
+func (m *httpServerMetrics) ObserveRequestDuration(method string, statusCode int, clientId string, duration time.Duration) {
 	if statusCode == http.StatusOK || statusCode == http.StatusInternalServerError {
-		m.requestTimeMs.WithLabelValues(method, strconv.Itoa(statusCode), strconv.Itoa(clientId)).Observe(float64(duration.Milliseconds()))
+		m.requestTimeMs.WithLabelValues(method, strconv.Itoa(statusCode), clientId).Observe(float64(duration.Milliseconds()))
 	}
 }
 
