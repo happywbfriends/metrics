@@ -8,4 +8,5 @@ const (
 	MetricsLabelName      = "name"
 	MetricsLabelShard     = "shard"
 	MetricsLabelHit       = "hit"
+	MetricsLabelClientId  = "client_id"
 )

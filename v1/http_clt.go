@@ -1,18 +1,18 @@
 package v1
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
 	"strconv"
 	"time"
 
 	"github.com/happywbfriends/metrics/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func NewHTTPClientMetrics() HTTPClientMetrics {
-	return NewHTTPServerMetricsClientRequestMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
+	return NewHTTPClientMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
 }
 
-func NewHTTPServerMetricsClientRequestMetricsWithBuckets(requestTimeMsBuckets []float64) HTTPClientMetrics {
+func NewHTTPClientMetricsWithBuckets(requestTimeMsBuckets []float64) HTTPClientMetrics {
 	m := &httpClientMetrics{
 		nbDone:        metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_done", nil, []string{MetricsLabelSubject, metrics.MetricsLabelMethod, metrics.MetricsLabelStatusCode}),
 		nbError:       metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_error", nil, []string{MetricsLabelSubject, metrics.MetricsLabelMethod}),
