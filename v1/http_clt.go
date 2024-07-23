@@ -8,15 +8,17 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func NewHTTPClientMetrics() HTTPClientMetrics {
+func NewHTTPClientMetrics() *httpClientMetrics {
 	return NewHTTPClientMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
 }
 
-func NewHTTPClientMetricsWithBuckets(requestTimeMsBuckets []float64) HTTPClientMetrics {
+func NewHTTPClientMetricsWithBuckets(requestTimeMsBuckets []float64) *httpClientMetrics {
 	m := &httpClientMetrics{
 		nbDone:        metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_done", nil, []string{MetricsLabelSubject, metrics.MetricsLabelMethod, metrics.MetricsLabelStatusCode}),
 		nbError:       metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_error", nil, []string{MetricsLabelSubject, metrics.MetricsLabelMethod}),
 		requestTimeMs: metrics.NewHistogramVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "req_duration_ms", nil, requestTimeMsBuckets, []string{MetricsLabelSubject, metrics.MetricsLabelMethod}),
+		dnsTimeMs:     metrics.NewHistogramVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "dns_duration_ms", nil, requestTimeMsBuckets, []string{MetricsLabelHost, MetricsLabelDnsCoalesced}),
+		connectTimeMs: metrics.NewHistogramVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "conn_duration_ms", nil, requestTimeMsBuckets, []string{MetricsLabelHost, MetricsLabelConnReused}),
 	}
 
 	return m
@@ -28,17 +30,27 @@ type HTTPClientMetrics interface {
 	ObserveRequestDuration(subject string, method string, t time.Duration)
 }
 
+type HTTPClientMetricsExtra interface {
+	HTTPClientMetrics
+	ObserveDnsDuration(host, coalesced string, t time.Duration)
+	ObserveConnectDuration(remoteAddr, reused string, t time.Duration)
+}
+
 type NoHTTPClientMetrics struct{}
 
 func (m *NoHTTPClientMetrics) IncNbDone(subject string, method string, statusCode int) {}
 func (m *NoHTTPClientMetrics) IncNbError(subject string, method string)                {}
 func (m *NoHTTPClientMetrics) ObserveRequestDuration(subject string, method string, t time.Duration) {
 }
+func (m *NoHTTPClientMetrics) ObserveDnsDuration(host, coalesced string, t time.Duration)        {}
+func (m *NoHTTPClientMetrics) ObserveConnectDuration(remoteAddr, reused string, t time.Duration) {}
 
 type httpClientMetrics struct {
 	nbDone        *prometheus.CounterVec
 	nbError       *prometheus.CounterVec
 	requestTimeMs *prometheus.HistogramVec
+	dnsTimeMs     *prometheus.HistogramVec
+	connectTimeMs *prometheus.HistogramVec
 }
 
 func (m *httpClientMetrics) IncNbDone(subject string, method string, statusCode int) {
@@ -51,4 +63,11 @@ func (m *httpClientMetrics) IncNbError(subject string, method string) {
 
 func (m *httpClientMetrics) ObserveRequestDuration(subject string, method string, t time.Duration) {
 	m.requestTimeMs.WithLabelValues(subject, method).Observe(float64(t.Milliseconds()))
+}
+
+func (m *httpClientMetrics) ObserveDnsDuration(host, coalesced string, t time.Duration) {
+	m.dnsTimeMs.WithLabelValues(host, coalesced).Observe(float64(t.Milliseconds()))
+}
+func (m *httpClientMetrics) ObserveConnectDuration(remoteAddr, reused string, t time.Duration) {
+	m.connectTimeMs.WithLabelValues(remoteAddr, reused).Observe(float64(t.Milliseconds()))
 }
