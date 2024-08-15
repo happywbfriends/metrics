@@ -8,11 +8,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func NewHTTPClientMetrics() *httpClientMetrics {
+func NewHTTPClientMetrics() HTTPClientMetricsExtra {
 	return NewHTTPClientMetricsWithBuckets(metrics.DefaultDurationMsBuckets)
 }
 
-func NewHTTPClientMetricsWithBuckets(requestTimeMsBuckets []float64) *httpClientMetrics {
+func NewHTTPClientMetricsWithBuckets(requestTimeMsBuckets []float64) HTTPClientMetricsExtra {
 	m := &httpClientMetrics{
 		nbDone:        metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_done", nil, []string{MetricsLabelSubject, metrics.MetricsLabelMethod, metrics.MetricsLabelStatusCode}),
 		nbError:       metrics.NewCounterVec(metrics.MetricsNamespace, metrics.MetricsSubsystemHttpClt, "nb_req_error", nil, []string{MetricsLabelSubject, metrics.MetricsLabelMethod}),
