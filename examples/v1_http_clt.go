@@ -11,6 +11,9 @@ func main() {
 	clientName := "example_api"
 
 	httpextrametrics := v1.NewHTTPClientMetrics()
+	useMetrics(httpextrametrics)
+	useExtraMetrics(httpextrametrics)
+
 	tp := metered.NewTracerProvider(
 		httpextrametrics,
 	)
@@ -28,4 +31,12 @@ func main() {
 	// }
 
 	// client.Do(req)
+}
+
+func useMetrics(m v1.HTTPClientMetrics) error {
+	return nil
+}
+
+func useExtraMetrics(m v1.HTTPClientMetricsExtra) error {
+	return nil
 }
