@@ -1,13 +1,14 @@
 package main
 
 import (
-	metricsv1 "github.com/happywbfriends/metrics/v1"
 	"net/http"
 	"time"
+
+	metricsv1 "github.com/happywbfriends/metrics/v1"
 )
 
 func HTTPServerExample() {
-	supplierOldId := 999
+	supplierOldId := "999"
 
 	httpServerMetrics := metricsv1.NewHTTPServerMetrics()
 
@@ -49,7 +50,7 @@ type MyHandler struct {
 }
 
 func (h MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	supplierOldId := 999
+	supplierOldId := "999"
 
 	timeBegin := time.Now()
 	method := "GET/bar"
